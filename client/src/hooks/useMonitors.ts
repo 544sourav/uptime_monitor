@@ -54,8 +54,43 @@ export function useMonitors() {
       { name, url, intervalSecond },
       { headers: { Authorization: `Bearer ${token}` } },
     );
-    setMonitors((prev) => [res.data, ...prev]);
+    setMonitors((prev) => [res.data.data, ...prev]);
+
+    // console.log(res.data.data);
   };
 
-  return { monitors, loading, createMonitor };
+  const updateMonitor = async (
+    id: string,
+    name: string,
+    url: string,
+    intervalSecond: number,
+  ) => {
+    const token = await getToken();
+
+    const res = await api.put(
+      `/monitors/${id}`,
+      { name, url, intervalSecond },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    console.log(res.data.data)
+    setMonitors((prev) => prev.map((m) => (m._id === id ? res.data.data : m)));
+  };
+
+  const deleteMonitor = async (id: string) => {
+    const token = await getToken();
+
+    await api.delete(`/monitors/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    setMonitors((prev) => prev.filter((m) => m._id !== id));
+  };
+
+  return { monitors, loading, createMonitor, updateMonitor, deleteMonitor };
 }

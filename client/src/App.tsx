@@ -8,7 +8,7 @@ import { useSocketAuth } from "./hooks/useSocketAuth";
 function App() {
   useSocketAuth();
   return (
-    <div>
+    <div className="bg-slate-950 h-screen">
       <Header />
       <Routes>
         <Route path="/sign-in/*" element={<SignInPage />} />
