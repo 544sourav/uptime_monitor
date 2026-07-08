@@ -3,6 +3,7 @@ import Monitor from "../models/Monitor";
 import { pingQueue } from "../queues/pingQueue";
 import { addMonitorSchedule, removeMonitorSchedule } from "../utils/scheduling";
 import { clerkClient } from "@clerk/express";
+import Incident from "../models/Incident";
 
 export const createMonitor = async (req: Request, res: Response) => {
   try {
@@ -81,21 +82,61 @@ export const getMonitors = async (req: Request, res: Response) => {
   }
 };
 
+// export const getMonitorById = async (req: Request, res: Response) => {
+//   try {
+//     const id = req.params.id;
+//     const userId = (req as any).userId;
+//     const monitor = await Monitor.findById({ _id:id, userId });
+//     if (!monitor) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Monitor not found",
+//       });
+//     }
+//     const incident = await Incident.find(monitor._id).sort({createdAt:-1}).limit(5);
+//     return res.status(200).json({
+//       success: true,
+//       message: "fetch successful",
+//       data: monitor,
+//     });
+//   } catch (err) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to get Monitor",
+//     });
+//   }
+// };
+
 export const getMonitorById = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const userId = (req as any).userId;
-    const monitor = await Monitor.findById({ _id:id, userId });
+
+    const monitor = await Monitor.findOne({
+      _id: id,
+      userId,
+    });
+
     if (!monitor) {
       return res.status(404).json({
         success: false,
         message: "Monitor not found",
       });
     }
+
+    const incidents = await Incident.find({
+      monitorId: monitor._id,
+    })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
     return res.status(200).json({
       success: true,
-      message: "fetch successful",
-      data: monitor,
+      message: "Fetch successful",
+      data: {
+        monitor,
+        incidents,
+      },
     });
   } catch (err) {
     return res.status(500).json({

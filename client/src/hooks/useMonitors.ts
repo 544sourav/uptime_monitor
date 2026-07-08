@@ -8,6 +8,7 @@ export function useMonitors() {
   const { getToken } = useAuth();
   const [monitors, setMonitors] = useState<Monitor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMutating, setIsMutating] = useState(false);
 
   useEffect(() => {
     const fetchMonitors = async () => {
@@ -48,15 +49,18 @@ export function useMonitors() {
     url: string,
     intervalSecond: number,
   ) => {
-    const token = await getToken();
-    const res = await api.post(
-      "/monitors",
-      { name, url, intervalSecond },
-      { headers: { Authorization: `Bearer ${token}` } },
-    );
-    setMonitors((prev) => [res.data.data, ...prev]);
-
-    // console.log(res.data.data);
+    setIsMutating(true);
+    try {
+      const token = await getToken();
+      const res = await api.post(
+        "/monitors",
+        { name, url, intervalSecond },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      setMonitors((prev) => [res.data.data, ...prev]);
+    } finally {
+      setIsMutating(false);
+    }
   };
 
   const updateMonitor = async (
@@ -65,32 +69,50 @@ export function useMonitors() {
     url: string,
     intervalSecond: number,
   ) => {
-    const token = await getToken();
+    setIsMutating(true);
+    try {
+      const token = await getToken();
 
-    const res = await api.put(
-      `/monitors/${id}`,
-      { name, url, intervalSecond },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await api.put(
+        `/monitors/${id}`,
+        { name, url, intervalSecond },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      },
-    );
-    console.log(res.data.data)
-    setMonitors((prev) => prev.map((m) => (m._id === id ? res.data.data : m)));
+      );
+      setMonitors((prev) =>
+        prev.map((m) => (m._id === id ? res.data.data : m)),
+      );
+    } finally {
+      setIsMutating(false);
+    }
   };
 
   const deleteMonitor = async (id: string) => {
-    const token = await getToken();
+    setIsMutating(true);
+    try {
+      const token = await getToken();
 
-    await api.delete(`/monitors/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      await api.delete(`/monitors/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    setMonitors((prev) => prev.filter((m) => m._id !== id));
+      setMonitors((prev) => prev.filter((m) => m._id !== id));
+    } finally {
+      setIsMutating(false);
+    }
   };
 
-  return { monitors, loading, createMonitor, updateMonitor, deleteMonitor };
+  return {
+    monitors,
+    loading,
+    isMutating,
+    createMonitor,
+    updateMonitor,
+    deleteMonitor,
+  };
 }

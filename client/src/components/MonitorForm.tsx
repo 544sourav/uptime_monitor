@@ -69,9 +69,12 @@ export default function MonitorForm({ onCreate }: Props) {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full whitespace-nowrap rounded-lg bg-blue-800 px-6 py-2.5 font-medium text-white transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:bg-blue-400 md:w-auto"
+          className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-blue-800 px-6 py-2.5 font-medium text-white transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:bg-blue-400 md:w-auto"
         >
-          {submitting ? "Adding..." : "Add Monitor"}
+          {submitting && (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></div>
+          )}
+          <span>{submitting ? "Adding..." : "Add Monitor"}</span>
         </button>
       </form>
 

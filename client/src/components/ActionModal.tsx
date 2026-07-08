@@ -118,9 +118,12 @@ export const ActionModal = ({
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-lg bg-blue-800 px-5 py-2 text-white hover:bg-blue-900 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg bg-blue-800 px-5 py-2 text-white hover:bg-blue-900 disabled:opacity-50"
               >
-                {submitting ? "Saving..." : "Save"}
+                {submitting && (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></div>
+                )}
+                <span>{submitting ? "Saving..." : "Save"}</span>
               </button>
             </div>
           </div>

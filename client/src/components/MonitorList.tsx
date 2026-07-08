@@ -1,6 +1,6 @@
 import type { Monitor } from "../types/Monitor";
 import MonitorCard from "./MonitorCard";
-
+import { Loading } from "./loading";
 
 interface Props {
   monitors: Monitor[];
@@ -14,11 +14,28 @@ interface Props {
   deleteMonitor: (id: string) => Promise<void>;
 }
 
-export default function MonitorList({ monitors, loading, updateMonitor,deleteMonitor }: Props) {
-  if (loading) return <p className="text-white">Loading monitors...</p>;
+export default function MonitorList({
+  monitors,
+  loading,
+  updateMonitor,
+  deleteMonitor,
+}: Props) {
+  if (loading) {
+    return (
+      <div className="flex flex-1 items-center justify-center p-6">
+        <Loading message="Loading monitors..." fullScreen={false} />
+      </div>
+    );
+  }
 
   if (monitors.length === 0)
-    return <p className="text-white">No monitors yet.</p>;
+    return (
+      <div className="flex flex-1 items-center justify-center ">
+        <p className="p-6 text-center text-slate-400">
+          No monitors yet. Add your first monitor to get started.
+        </p>
+      </div>
+    );
 
   return (
     <div className="p-4">

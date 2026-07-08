@@ -8,4 +8,5 @@ export interface Monitor {
   status: "up" | "down" | "unknown";
   consecutiveFailures: number;
   lastCheckedAt: string | null;
+  createdAt:string |null;
 }
